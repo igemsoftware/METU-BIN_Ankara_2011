@@ -4,6 +4,8 @@ M4B: Mining for BioBricks
 The source code is composed of 6 .java files. 
 In order to compile the source files, yFiles Graph Visualization library (for which we have a single developer license for dayhoff.ii.metu.edu.tr) is required.
 
+A compiled and running version of M4B can be reached at: http://dayhoff.ii.metu.edu.tr:8080/m4b/
+
 M4BApplet.java is the main applet and GUI code.
 
 PathwayFinder.java is the main code for finding composite devices in the parts registry graph. The source code is modified from the original version to hide some user/password information required for remote database access. The original passwords are replaced with "******".
