@@ -33,7 +33,7 @@ public class PathwayFinder {
 
     public PathwayFinder() {
     }
-
+    
     public Hashtable getNetwork(String[] interactions) {
         Hashtable network = new Hashtable();
 
@@ -76,7 +76,7 @@ public class PathwayFinder {
 
         return network;
     }
-
+    
     public Hashtable getNetwork2(String[] interactions) {
         Hashtable network = new Hashtable();
 
@@ -88,14 +88,14 @@ public class PathwayFinder {
             String partType1 = Utils.recoverSpelling(edgeInfo[1].trim().toUpperCase());
             String part2 = Utils.recoverSpelling(edgeInfo[2].trim().toUpperCase());
             String partType2 = Utils.recoverSpelling(edgeInfo[3].trim().toUpperCase());
-
+            
             String interactionType = "" + partType2.substring(0,1);
             String promoterType = "-";//TODO Default olarak bu iþaret kullanýldý ama deðiþtirilecek.
             if(edgeInfo.length == 5){
                 promoterType = Utils.recoverSpelling(edgeInfo[4].trim().toUpperCase());
                 promoterType = promoterType.substring(0,1);
             }
-
+            
             if (!network.containsKey(part1)) { //eger bu part daha onceden eklenmemisse...
                 Part partInfo = new Part();
                 partInfo.partID = part1;
@@ -104,17 +104,17 @@ public class PathwayFinder {
                 }else{*/
                     partInfo.partType = partType1.substring(0,1);
                 //}
-
+                
                 //partInfo.promoterType = promoterType.substring(0,1);//TODO BU VE BUNUNLA ÝLGÝLÝ SATIRLAR SÝLÝNECEK
                 //partInfo.promoterType = "A";//TODO BU VE BUNUNLA ÝLGÝLÝ SATIRLAR SÝLÝNECEK
-
+                
                 Hashtable nextParts = new Hashtable();
                 if(!promoterType.equals("I")){//Inhibitor deðilse nextPart'lara ekle TODO doðruluðu kontrol edilecek
                     Part nextPartInfo = new Part(part2, interactionType, promoterType, "", "", null);
                     nextParts.put(part2, nextPartInfo);
                 }
                 partInfo.nextParts = nextParts;
-
+                
                 if(interactionType.equals("O")){
                     partInfo.output = part2;
                 }else if(interactionType.equals("T")){
@@ -128,7 +128,7 @@ public class PathwayFinder {
                         Part nextPartInfo = new Part(part2, interactionType, promoterType, "", "", null);
                         partInfo.nextParts.put(part2, nextPartInfo);
                     }
-
+                    
                     if(interactionType.equals("O")){
                         partInfo.output = part2;
                     }else if(interactionType.equals("T")){
@@ -141,17 +141,12 @@ public class PathwayFinder {
 
         return network;
     }
-
+	
 	public Hashtable getNetwork3() {
         Hashtable network = new Hashtable();
 		System.out.println("EHU EHU");
 		try {
-			/*Class.forName("com.mysql.jdbc.Driver");
-            MysqlTunnelSession session = new MysqlTunnelSession("dayhoff.ii.metu.edu.tr", 22, "****", "********" ,"127.0.0.1", 3306,"root", "*********"); // removed password information
-			Connection con = session.getConnection("sasandb");*/
 			Connection con = IIConnection.getIIConnection();
-
-            //String url = "jdbc:mysql://dayhoff.ii.metu.edu.tr:22/sasandb";
             Statement stmt = con.createStatement();
 			ResultSet set = stmt.executeQuery("SELECT * FROM interactions_wide");
 			while(set.next()){
@@ -161,9 +156,9 @@ public class PathwayFinder {
 				String partType2 = Utils.recoverSpelling(set.getString("type2").toUpperCase());
 				String promoterType = Utils.recoverSpelling(set.getString("promoter_type").toUpperCase());
 				promoterType = promoterType.substring(0,1);
-
+				
 				String interactionType = "" + partType2.substring(0,1);
-
+				
 				if (!network.containsKey(part1)) { //eger bu part daha onceden eklenmemisse...
 					Part partInfo = new Part();
 					partInfo.partID = part1;
@@ -172,17 +167,17 @@ public class PathwayFinder {
 					}else{*/
 						partInfo.partType = partType1.substring(0,1);
 					//}
-
+					
 					//partInfo.promoterType = promoterType.substring(0,1);//TODO BU VE BUNUNLA ÝLGÝLÝ SATIRLAR SÝLÝNECEK
 					//partInfo.promoterType = "A";//TODO BU VE BUNUNLA ÝLGÝLÝ SATIRLAR SÝLÝNECEK
-
+					
 					Hashtable nextParts = new Hashtable();
 					if(!promoterType.equals("I")){//Inhibitor deðilse nextPart'lara ekle TODO doðruluðu kontrol edilecek
 						Part nextPartInfo = new Part(part2, interactionType, promoterType, "", "", null);
 						nextParts.put(part2, nextPartInfo);
 					}
 					partInfo.nextParts = nextParts;
-
+					
 					if(interactionType.equals("O")){
 						partInfo.output = part2;
 					}else if(interactionType.equals("T")){
@@ -196,7 +191,7 @@ public class PathwayFinder {
 							Part nextPartInfo = new Part(part2, interactionType, promoterType, "", "", null);
 							partInfo.nextParts.put(part2, nextPartInfo);
 						}
-
+						
 						if(interactionType.equals("O")){
 							partInfo.output = part2;
 						}else if(interactionType.equals("T")){
@@ -216,7 +211,9 @@ public class PathwayFinder {
 
     public ArrayList<ArrayList<Part>> findAllPathways(Hashtable network, String inputPart, String outputPart, Integer deviceCount) {
         ArrayList<ArrayList<Part>> pathways = null;
-
+        
+		System.out.println(inputPart +"\t>\t"+ outputPart);
+		
         if (network.containsKey(inputPart)) { //TODO bunun gercekten input olup olmadigi kontrol edilebilir.
             firstCall = true;
             pathways = getPaths(network, inputPart, outputPart, deviceCount);
@@ -226,7 +223,7 @@ public class PathwayFinder {
             JOptionPane.showMessageDialog(null, optionLabel);
             pathways = null;//isi garantiye almak icin
         }
-
+        
         return pathways;
     }
 
@@ -242,7 +239,7 @@ public class PathwayFinder {
       * ADHNTGKT yerine ADHNYGKY yazdýracan.
       *
       * bunu en son T'leri Y ile replace ederek yapabilirsin. BINGO!
-      *
+      * 
       * TODO
       * PROBLEM2:
       * Kerem'in belirttiði durum:
@@ -253,38 +250,38 @@ public class PathwayFinder {
         ArrayList<ArrayList<Part>> pathList = new ArrayList<ArrayList<Part>>();
         ArrayList<Part> path = new ArrayList<Part>();
         Part outputPart = new Part(output, "O", "", "", "", null);
-
+        
         ArrayList<String> stack = new ArrayList<String>();
         ArrayList<Integer> childCountStack = new ArrayList<Integer>();
-
+        
         stack.add(input);//PUSH
-
+        
         while (stack.size() > 0) {
             String parent = stack.remove(stack.size() - 1); //POP
-
+            
             boolean isPartInNetwork = network.containsKey(parent);//this variable is defined to speed up program running.
             Part part = null;
             if (isPartInNetwork) {
                 part = (Part) network.get(parent);
                 //part.nextParts = null; //TODO luzumu halinde acilacak. sebebi asagida yaziyor.
-                                        //nextParts degiskeni þimdilik silinmedi.
-                                       //eger ilerde kullanilmazsa Part class'i gibi ayri bi class tanimlanip kullanilmasi iyi olur.
-                                       //Bu class'in içinde nextParts degiskeni olmayacak.
+                                        //nextParts degiskeni þimdilik silinmedi. 
+                                       //eger ilerde kullanilmazsa Part class'i gibi ayri bi class tanimlanip kullanilmasi iyi olur. 
+                                       //Bu class'in içinde nextParts degiskeni olmayacak. 
                                        //Ya da burda path'e eklenmeden once nextParts degeri null'a esitlenir. bu daha iyi bence.
             }else{
                 part = new Part(parent, "", "", "", "", null);//bunun cocuklari olmadigi icin zaten asagida path'ten cikarilacak. bu yüzden tipini yazmaya gerek yok.
             }
-
-
-            /*if(part.partType.equals("X") ||
-               part.partType.equals("Y") ||
-               part.partType.equals("Z") ||
-               part.partType.equals("W") ||
+            
+            
+            /*if(part.partType.equals("X") || 
+               part.partType.equals("Y") || 
+               part.partType.equals("Z") || 
+               part.partType.equals("W") || 
                part.partType.equals("Q")){
                 System.out.println(part.partType + "\t" + part.partID);
             }*/
-
-
+            
+            
             if(getIndex(parent, path) < 0){//aynisindan daha once eklemediysek. bu, LOOP'u engellemek icin yapýlan bir kontroldür.
                 if (parent.equals(output)) {
                     //TODO BURAYA DIKKAT
@@ -297,13 +294,13 @@ public class PathwayFinder {
                     }else{
                         terminator.partID = gene.terminator;
                     }
-
+                    
                     path.add(terminator);//TODO þu an eklenen Part bir output olduðu için bir öncesi mutlaka Gen'dir mantýðýyla yapýldý.
                                          //Ancak, RBS+Gene ve Promoter+RBS+Gene de olabilir. bunlar icin ozel sart koyulacak.
                     path.add(outputPart);//TODO bu doðru bir uygulama gibi görünüyor. ama daha sonra kontrol edilmesinde fayda var.
-
+                    
                     /* TODO Burdaki islemler program gelistiricisi icin
-
+					
 					String parts = "";
                     String partTypes = "";
                     for (int k = 0; k < path.size(); k++)  {
@@ -313,16 +310,16 @@ public class PathwayFinder {
                     System.out.println(parts);
                     writeFile(parts, 1);
                     writeFile(partTypes, 1);*/
-
+                    
                     ArrayList<Part> path1 = new ArrayList<Part>();
-                    for (int ik = 0; ik < path.size(); ik++){//The reason is Java and C# uses reference based assignments so they just pass reference, for solving this problem, a copy of the object is taken and then it is destroyed.
+                    for (int ik = 0; ik < path.size(); ik++){//The reason is Java and C# uses reference based assignments so they just pass reference, for solving this problem, a copy of the object is taken and then it is destroyed. 
                         path1.add(path.get(ik));
                     }
-
-                    if(checkDeviceCount(path1, deviceCount)){//TODO þimdilik böyle yapýldý. ancak programý hýzlandýrmak için path oluþtururken kontrol edilebilir.
+                    
+                    if(checkDeviceCount(path1, deviceCount)){//TODO þimdilik böyle yapýldý. ancak programý hýzlandýrmak için path oluþtururken kontrol edilebilir. 
                         pathList.add(path1);
                     }
-
+                    
                     //path1 = new ArrayList<Part>();
                 }else{
                     /*if(!part.partID.equals("$")){//TODO constitutive'ler için yapilan bi deneme
@@ -330,7 +327,7 @@ public class PathwayFinder {
                     }*/
                     path.add(part);
                 }
-
+                
                 if (isPartInNetwork) {//if node has children, then add those children to stack.
                     boolean isPathOK = false;
                     /*if(part.promoterType.equals("I")){
@@ -341,11 +338,11 @@ public class PathwayFinder {
                             //BIR ONCEKI PART'IN TIPI T ISE 2 ONCESININ OUTPUT'UNU KONTROL ET.
                             //EGER BU OUTPUT BU PROMOTER'A INPUT OLARAK GIRIYORSA PATH DOGRUDUR.
                             //GIRMIYORSA BASKA YOLDAN DEVAM EDECEK.lastNode
-
+                            
                             Part lastNode = path.get(path.size()-2);//BIR ONCESI
                             if(lastNode.partType.equals("T")){//partType Promoter ise lastNode'un partType'i ya T ya da I olmalidir, diye düþünüyorum, ben, yaaanii.
                                 lastNode = path.get(path.size()-3);//MUST BE IN G,Y,Z,Q
-
+                                
                                 Part outputNode = (Part) network.get(lastNode.output);
                                 if(outputNode != null){
                                     Enumeration iterator = outputNode.nextParts.keys();
@@ -365,9 +362,9 @@ public class PathwayFinder {
                                 if(lastNode.partType.equals("I")){//path size'ýn 2'den büyük olmasý demek, lastNode'un ilk node olmamasý demek.
                                     if(path.size() > 2){
                                         lastNode = path.get(path.size()-3);//MUST BE IN G,Y,Z,Q,W
-                                        /*if(lastNode.partType.equals("G")
-                                           || lastNode.partType.equals("Y")
-                                           || lastNode.partType.equals("Z")
+                                        /*if(lastNode.partType.equals("G") 
+                                           || lastNode.partType.equals("Y") 
+                                           || lastNode.partType.equals("Z") 
                                            || lastNode.partType.equals("Q")){*/
                                             Part terminator = new Part("", "T", "", "", "", null);
                                             if(lastNode.terminator.equals("")){
@@ -376,11 +373,11 @@ public class PathwayFinder {
                                             }else{
                                                 terminator.partID = lastNode.terminator;
                                             }
-
+                                            
                                             path.add(path.size()-2, terminator);//ARAYA TERMINATOR SOKUYORUZ
                                             path.remove(path.size()-2);//TERMINATOR'DAN BÝR SONRA GELEN INPUT TIPINDEKI NODE'U SÝLÝYORUZ.
                                         /*}else{
-                                            //TODO
+                                            //TODO 
                                         }*/
                                     }
                                 }else{
@@ -399,7 +396,7 @@ public class PathwayFinder {
                             isPathOK = true;
                         }
                     //}
-
+                    
                     if(isPathOK){
                         Hashtable nextParts = part.nextParts;
                         Integer childCount = part.nextParts.size();
@@ -428,17 +425,17 @@ public class PathwayFinder {
                 path = cropPath(path, childCountStack);//DOGRU. BI DAHA BI DAHA KONTROL ETME.
             }
         }
-
+        
         System.out.println("BITTI");
-
+        
         return pathList;
     }
-
+     
 	private boolean checkDeviceCount(ArrayList<Part> path, Integer deviceCount) {
         if(deviceCount < 1){
             return true;
         }
-
+        
         int size = path.size();
         int count = 0;
         for (int i = 0; i < size; i++) {
@@ -453,7 +450,7 @@ public class PathwayFinder {
 
         return true;
     }
-
+    
     private int getIndex(String part, ArrayList<Part> path){
         int index = -1;
         int size = path.size();
@@ -464,10 +461,10 @@ public class PathwayFinder {
                 found = true;
             }
         }
-
+        
         return index;
     }
-
+    
     /**
      * childcount'u 0'a inenleri path'ten çýkarma islemi
      * */
@@ -495,10 +492,10 @@ public class PathwayFinder {
         for (int i = 0; i < removalCount; i++) {
             croppedPath.remove(croppedPath.size()-1);//REMOVE LAST NODE
         }
-
+        
         return croppedPath;
     }
-
+    
     private void writeFile(String str, int fileNo) {
         try {
             FileWriter fstream;
@@ -509,7 +506,7 @@ public class PathwayFinder {
                 firstCall = false;
             } else {
                 fstream = new FileWriter(outFileName, true); //append mode
-                fstream2 =
+                fstream2 = 
                         new FileWriter(interactionsFileName, true); //append mode
             }
             BufferedWriter out;
