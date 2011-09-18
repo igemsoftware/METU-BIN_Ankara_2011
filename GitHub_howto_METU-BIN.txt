@@ -1,0 +1,33 @@
+GitHub Howto update an existing repository:
+
+1. Run GitHub Bash shell using the shortcut (Git Bash) on the desktop
+
+2. Create a new directory at Git Bash for checking out the repository
+
+$ mkdir <newDir>, e.g. mkdir M4Blatest
+
+3. Check out the repository to the new directory you have created
+
+
+$ cd <newDir>
+$ git init
+$ git remote add origin git@github.com:igemsoftware/METU-BIN_Ankara_2011.git
+$ git pull origin master
+<enter pass phrase which is the same as the METU-BIN password>
+
+4. Work on the files or replace/add anyfiles in the directory
+
+5. Use "git add" to add to the list of updated/inserted files
+
+$ git add M4BApplet.java
+$ git add README
+etc.
+
+6. Commit your changes
+
+$ git commit 'M4B source"
+
+7. Submit your changes
+
+$ git push origin master
+<enter pass phrase which is the same as the METU-BIN password>
