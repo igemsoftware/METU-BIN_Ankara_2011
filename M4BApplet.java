@@ -14,6 +14,8 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -38,6 +40,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.DefaultListModel;
 
 import y.base.Node;
 
@@ -66,23 +69,26 @@ import java.io.IOException;
 import java.awt.Image;
 import java.awt.Graphics;
 
-public class M4BApplet extends Applet implements ActionListener{
+public class M4BApplet extends Applet implements ActionListener, KeyListener{
     private static int FILE_READ_ERROR = -2;
     private String file = "C:\\GOKHAN\\MSc2011\\iGEM\\algo_files\\input_files\\io5.txt"; //TODO bunu kullaniciya sectirmenin alemi yok.
                                                                                                 //zaten bu daha sonra veritabanindan cekecek partlari.
-    private Hashtable network;
-	PathwayFinder pathwayFinder;
+	private PathwayFinder pathwayFinder;
+	private Hashtable network;
     // Variables declaration
-    private JLabel lblInput;
-    private JTextField txtInput;
-	private JComboBox cmbInput;
+	private JLabel lblRowCount;
+	private JLabel lblInput;
     private JLabel lblOutput;
+	private JTextField txtInput;
 	private JTextField txtOutput;
+	private JComboBox cmbInput;
 	private JComboBox cmbOutput;
-    private JLabel lblDeviceCount;
+    private JList listInput;
+	private JList listOutput;
+	private JLabel lblDeviceCount;
+	private JTextField txtInputSearch;
 	private JTextField txtDeviceCount;
-    private JButton btnFind;
-    private JTextArea txtareaPathways;
+	private JButton btnFind;
     private JList listPathways;
 	private JTextArea txtareaPartInfo;
 	private JTextPane txtpanePartInfo;
@@ -113,17 +119,23 @@ public class M4BApplet extends Applet implements ActionListener{
     private void create() {
 		pathwayFinder = new PathwayFinder();
 		network = pathwayFinder.getNetwork3();
-	
-	
+		
+		txtInputSearch = new JTextField();
+		
+		txtDeviceCount = new JTextField();
+        btnFind = new JButton();
+		
+		lblRowCount = new JLabel();
         lblInput = new JLabel();
         lblOutput = new JLabel();
         lblDeviceCount = new JLabel();
         txtInput = new JTextField();
 		
+		/*ArrayList<String> allInputs = new ArrayList<String>();
 		try{
 			Statement stmt = con.createStatement();
 			ResultSet set = stmt.executeQuery("SELECT DISTINCT(part1) AS part1 FROM interactions_wide WHERE type1 = 'I' ORDER BY part1");//AND part1 LIKE '%tetr%'
-			ArrayList<String> allInputs = new ArrayList<String>();
+			
 			allInputs.add("");
 			while(set.next()){
 				allInputs.add(set.getString("part1"));
@@ -131,14 +143,17 @@ public class M4BApplet extends Applet implements ActionListener{
 			cmbInput = new JComboBox(allInputs.toArray());
 		}catch(Exception e){
 			e.printStackTrace();
-		}
+		}*/
+		cmbInput = new JComboBox();
+		cmbOutput = new JComboBox();
 		
         txtOutput = new JTextField();
 		
+		/*ArrayList<String> allOutputs = new ArrayList<String>();
 		try{
 			Statement stmt = con.createStatement();
-			ResultSet set = stmt.executeQuery("SELECT DISTINCT(part2) AS part2 FROM interactions_wide WHERE type2 = 'O' ORDER BY part2");//AND part1 LIKE '%tetr%'
-			ArrayList<String> allOutputs = new ArrayList<String>();
+			ResultSet set = stmt.executeQuery("SELECT DISTINCT(part2) AS part2 FROM interactions_wide WHERE type2 = 'O' ORDER BY part2");//AND part2 LIKE '%tetr%'
+			
 			allOutputs.add("");
 			while(set.next()){
 				allOutputs.add(set.getString("part2"));
@@ -146,21 +161,24 @@ public class M4BApplet extends Applet implements ActionListener{
 			cmbOutput = new JComboBox(allOutputs.toArray());
 		}catch(Exception e){
 			e.printStackTrace();
-		}
+		}*/
 		
-        txtDeviceCount = new JTextField();
-        btnFind = new JButton();
+		//Object[] inputList = allInputs.toArray();
+		Object[] inputList = getInputList("");
+		//Object[] outputList = allOutputs.toArray();
 		
 		txtFeedBack = new JTextField();
         btnFeedBack = new JButton();
 		
-        txtareaPathways = new JTextArea();
 		txtareaPartInfo = new JTextArea();
 		txtpanePartInfo = new JTextPane();
 		txtpanePartInfo.setContentType("text/html");
 		txtpanePartInfo.setEditable(false);
 		
         listPathways = new JList();
+		listInput = new JList();
+		listOutput = new JList();
+		
         /*JPanel abc = new JPanel();
         abc.setBackground(new Color(255, 0, 0));
         JLabel tttt = new JLabel();
@@ -175,27 +193,22 @@ public class M4BApplet extends Applet implements ActionListener{
         
         //contentPane = (JPanel)this.getContentPane();
 
-        //
-        // lblInput
-        //
+        lblRowCount.setHorizontalAlignment(SwingConstants.RIGHT);
+        lblRowCount.setForeground(new Color(255, 255, 0));
+        lblRowCount.setText("");
+		
         lblInput.setHorizontalAlignment(SwingConstants.RIGHT);
         lblInput.setForeground(new Color(255, 255, 0));
         lblInput.setText("Input:");
-        //
-        // lblOutput
-        //
+
         lblOutput.setHorizontalAlignment(SwingConstants.RIGHT);
         lblOutput.setForeground(new Color(255, 255, 0));
         lblOutput.setText("Output:");
-        //
-        // lblDeviceCount
-        //
+
         lblDeviceCount.setHorizontalAlignment(SwingConstants.RIGHT);
         lblDeviceCount.setForeground(new Color(255, 255, 0));
         lblDeviceCount.setText("Max # of Devices:");
-        //
-        // txtInput
-        //
+
         txtInput.setForeground(new Color(0, 0, 255));
         txtInput.setSelectedTextColor(new Color(0, 0, 255));
         txtInput.setToolTipText("Enter Input");
@@ -213,9 +226,6 @@ public class M4BApplet extends Applet implements ActionListener{
                         cmbInput_actionPerformed(e);
                     }
                 });
-        //
-        // txtOutput
-        //
         txtOutput.setForeground(new Color(0, 0, 255));
         txtOutput.setToolTipText("Enter an Output");
         /*txtOutput.addActionListener(new ActionListener() {
@@ -232,7 +242,17 @@ public class M4BApplet extends Applet implements ActionListener{
                         cmbOutput_actionPerformed(e);
                     }
                 });
-				
+			
+        txtInputSearch.setForeground(new Color(0, 0, 255));
+        txtInputSearch.setSelectedTextColor(new Color(0, 0, 255));
+        txtInputSearch.setToolTipText("Enter Input");
+        /*txtInputSearch.addKeyListener(new KeyListener() {
+                    public void actionPerformed(KeyEvent e) {
+                        txtInputSearch_actionPerformed(e);
+                    }
+                });*/
+		txtInputSearch.addKeyListener(this);
+			
         //
         // txtDeviceCount
         //
@@ -281,23 +301,6 @@ public class M4BApplet extends Applet implements ActionListener{
                 });*/
 		btnFeedBack.addActionListener(this);
         btnFeedBack.setActionCommand("btnFeedBack_actionPerformed");
-
-		
-
-        //
-        //output partition
-        //
-        //ScrollPane scPathways = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
-        txtareaPathways.setEditable(false);
-        txtareaPathways.setText("\n");
-        txtareaPathways.setForeground(new Color(0, 0, 255));
-        txtareaPathways.setToolTipText("All possible pathways from selected input to selected output.");
-        txtareaPathways.setSelectedTextColor(new Color(0, 255, 255));
-        txtareaPathways.setFont(defaultFont);
-        JScrollPane scTxtareaPathways = new JScrollPane(txtareaPathways);
-        //scTxtareaPathways.add(txtareaPathways);
-        //scTxtareaPathways.setSize(txtareaPathways.getWidth(), 60);
-		
 		
         txtareaPartInfo.setEditable(false);
         txtareaPartInfo.setText("\n");
@@ -317,7 +320,7 @@ public class M4BApplet extends Applet implements ActionListener{
         //list
         //
         //listPathways.setForeground(new Color(0, 0, 255));
-        listPathways.setToolTipText("All possible pathways from selected input to selected output.");
+        listPathways.setToolTipText("All possible composite devices from selected input to selected output.");
         listPathways.setFont(defaultFont);
         listPathways.setSelectionBackground(new Color(147,226,75));
         listPathways.setSelectionForeground(new Color(0,0,0));
@@ -329,9 +332,41 @@ public class M4BApplet extends Applet implements ActionListener{
                 }
             }
         );
-		
         JScrollPane scListPathways = new JScrollPane(listPathways);
         
+		
+		listInput.setToolTipText("All available input parts.");
+        listInput.setFont(defaultFont);
+        listInput.setSelectionBackground(new Color(147,226,75));
+        listInput.setSelectionForeground(new Color(0,0,0));
+        //listInput.addSelectionInterval(1,1);
+        listInput.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listInput.addListSelectionListener(new ListSelectionListener(){
+                public void valueChanged(ListSelectionEvent e) {
+                    listInput_actionPerformed(e);
+                }
+            }
+        );
+        JScrollPane scListInput = new JScrollPane(listInput);
+		listInput.setListData(inputList);
+		listInput.setSelectedIndex(0);
+		
+		listOutput.setToolTipText("All available input parts.");
+        listOutput.setFont(defaultFont);
+        listOutput.setSelectionBackground(new Color(147,226,75));
+        listOutput.setSelectionForeground(new Color(0,0,0));
+        //listOutput.addSelectionInterval(1,1);
+        listOutput.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listOutput.addListSelectionListener(new ListSelectionListener(){
+                public void valueChanged(ListSelectionEvent e) {
+                    listOutput_actionPerformed(e);
+                }
+            }
+        );
+        JScrollPane scListOutput = new JScrollPane(listOutput);
+		//listOutput.setListData(outputList);
+		//listOutput.setSelectedIndex(0);
+		
         //
         // contentPane
         //
@@ -340,26 +375,32 @@ public class M4BApplet extends Applet implements ActionListener{
         //contentPane.setBorder(BorderFactory.createEtchedBorder());
         //contentPane.setBackground(new Color(204, 204, 204));
         this.setBackground(new Color(204, 204, 204));
-        addComponent(this, lblInput, 5, 160, 66, 18);
-        //addComponent(this, txtInput, 75, 160, 140, 22);
-		addComponent(this, cmbInput, 75, 160, 140, 22);
-        addComponent(this, lblOutput, 5, 197, 66, 18);
-		//addComponent(this, txtOutput, 75, 195, 140, 22);
-		addComponent(this, cmbOutput, 75, 195, 140, 22);
-        addComponent(this, lblDeviceCount, 35, 234, 100, 18);
-		addComponent(this, txtDeviceCount, 145, 230, 70, 22);
-        addComponent(this, btnFind, 35, 260, 180, 28);
-		placeM4BIcon();
-        //addComponent(this, scTxtareaPathways, 50, 150, 400, 400);//TODO buna gerek kalmadi. daha sonra bunu ve baglantilarini silersin.
-        addComponent(this, scTxtareaPartInfo, 790, 10, 390, 520);
-		//addComponent(this, scPnlGraph, 230, 10, 550, 330);
-		//addComponent(this, new JPanel(), 230, 10, 550, 330);
-		addComponent(this, pnlGraph, 230, 10, 550, 330);
-        
-		addComponent(this, scListPathways, 10, 350, 770, 180);
 		
-		addComponent(this, txtFeedBack, 10, 538, 1050, 28);
-		addComponent(this, btnFeedBack, 1070, 538, 110, 28);
+		placeM4BIcon();
+		
+        
+		/*addComponent(this, cmbInput, 75, 160, 140, 22);
+        addComponent(this, lblOutput, 5, 197, 66, 18);
+		addComponent(this, cmbOutput, 75, 195, 140, 22);*/
+		addComponent(this, btnFind, 230, 100, 180, 28);//35, 260, 180, 28
+		addComponent(this, lblInput, 5, 130, 38, 18);
+		addComponent(this, txtInputSearch, 45, 130, 180, 28);
+        addComponent(this, lblDeviceCount, 240, 134, 100, 18);
+		addComponent(this, txtDeviceCount, 340, 130, 70, 28);//145, 230, 70, 22
+        
+		////addComponent(this, scPnlGraph, 230, 10, 550, 330);
+		////addComponent(this, new JPanel(), 230, 10, 550, 330);
+		addComponent(this, pnlGraph, 415, 10, 405, 320);
+        
+		addComponent(this, scListInput, 10, 160, 400, 83);
+		addComponent(this, scListOutput, 10, 246, 400, 84);
+		addComponent(this, lblRowCount, 620, 330, 200, 28);
+		addComponent(this, scListPathways, 10, 350, 810, 180);
+		
+		addComponent(this, scTxtareaPartInfo, 830, 10, 350, 520);
+		
+		addComponent(this, txtFeedBack, 10, 538, 1030, 28);
+		addComponent(this, btnFeedBack, 1050, 538, 130, 28);
         
 		//contentPane.setSize(100,100);
         //
@@ -415,10 +456,101 @@ public class M4BApplet extends Applet implements ActionListener{
 
     private void btnFind_actionPerformed() {//(ActionEvent e)
         System.out.println("\nbtnFind_actionPerformed(ActionEvent e) called.");
-        /*String input = new String(txtInput.getText());
-        String output = new String(txtOutput.getText());*/
-		String input = (String) cmbInput.getSelectedItem();
-        String output = (String) cmbOutput.getSelectedItem();
+        
+		/*String input = (String) cmbInput.getSelectedItem();
+        String output = (String) cmbOutput.getSelectedItem();*/
+		String input = (String) listInput.getSelectedValue();
+        String output = (String) listOutput.getSelectedValue();
+		
+        System.out.println("input: "+input);
+        System.out.println("output: "+output);
+				
+        Integer deviceCount = 0;
+        if(Utils.isInteger(txtDeviceCount.getText())){
+            deviceCount = new Integer(txtDeviceCount.getText());
+            /*if(deviceCount < 1){
+                deviceCount = 1;
+            }*/
+        }
+        
+        if (input.equals("")){//TODO constitutive'ler için geçici olarak yapýlmýþ bir çözüm.
+            input = "$";
+        }
+
+        if (input.equals("") || output.equals("")) // If output and input is empty > Do this >>>
+        {
+            btnFind.setEnabled(false);
+            JLabel errorFields = new JLabel("<HTML><FONT COLOR = Blue>You must enter an input and output to get results.</FONT></HTML>");
+            JOptionPane.showMessageDialog(null, errorFields);
+            txtInput.setText("");
+            txtOutput.setText("");
+            btnFind.setEnabled(true);
+            this.setVisible(true);
+        } else {
+            JLabel optionLabel = new JLabel();
+            
+            if (input.equals("$")){//TODO constitutive'ler için geçici olarak yapýlmýþ bir çözüm.
+                optionLabel = 
+                    new JLabel("<HTML><FONT COLOR = Blue>Composite device searching will start <BR>with</FONT><FONT COLOR = RED> <B>Constitutive Promoters</B></FONT> <FONT COLOR = Blue>as input <BR>and</FONT><FONT COLOR = RED> <B>" + 
+                               output + "</B></FONT> <FONT COLOR = Blue>as output.<BR>Do you confirm?</FONT></HTML>");
+            }else{
+                optionLabel = 
+                    new JLabel("<HTML><FONT COLOR = Blue>Composite device searching will start <BR>with</FONT><FONT COLOR = RED> <B>" + 
+                               input + 
+                               "</B></FONT> <FONT COLOR = Blue>as input <BR>and</FONT><FONT COLOR = RED> <B>" + 
+                               output + 
+                               "</B></FONT> <FONT COLOR = Blue>as output.<BR>Do you confirm?</FONT></HTML>");
+            }
+            
+            /*int confirm = JOptionPane.showConfirmDialog(null, optionLabel);
+            switch (confirm) { // Switch > Case
+				case JOptionPane.YES_OPTION: // Attempt to Login user*/
+					btnFind.setEnabled(false); // Set button enable to false to prevent 2 login attempts
+					
+					//listPathways.setListData(new Object[1]);//empty list
+					listPathways.setModel(new DefaultListModel());
+					
+					ArrayList<ArrayList<Part>> pathways = pathwayFinder.findAllPathways(network,Utils.recoverSpelling(input.toUpperCase()), Utils.recoverSpelling(output.toUpperCase()), deviceCount);
+					if(pathways != null){
+						if(pathways.size() == 0){
+							optionLabel = new JLabel("<HTML><FONT COLOR = RED><B>NO DEVICE!</B></FONT></HTML>");
+							JOptionPane.showMessageDialog(null, optionLabel);
+						}else{
+							//optionLabel = new JLabel("<HTML><FONT COLOR = RED><B>"+pathways.size()+"</B></FONT><FONT COLOR = BLUE> device(s) found!</FONT></HTML>");
+							lblRowCount.setText(pathways.size()+" composite device(s) found!");
+							//JOptionPane.showMessageDialog(null, optionLabel);
+							String[] pathList = getPathList(pathways);
+							listPathways.setListData(pathList);
+						}
+					}else{
+						//TODO
+					}
+					
+					btnFind.setEnabled(true);
+				/*	break;
+				case JOptionPane.NO_OPTION: // No Case.(Go back. Set text to 0)
+					btnFind.setEnabled(false);
+					txtInput.setText("");
+					txtOutput.setText("");
+					btnFind.setEnabled(true);
+					break;
+				case JOptionPane.CANCEL_OPTION: // Cancel Case.(Go back. Set text to 0)
+					btnFind.setEnabled(false);
+					txtInput.setText("");
+					txtOutput.setText("");
+					btnFind.setEnabled(true);
+					break;
+			} // End Switch > Case*/
+        }
+    }
+	
+	private void btnFind_actionPerformed_ESKI() {//(ActionEvent e)
+        System.out.println("\nbtnFind_actionPerformed(ActionEvent e) called.");
+        
+		/*String input = (String) cmbInput.getSelectedItem();
+        String output = (String) cmbOutput.getSelectedItem();*/
+		String input = (String) listInput.getSelectedValue();
+        String output = (String) listOutput.getSelectedValue();
 		
         System.out.println("input: "+input);
         System.out.println("output: "+output);
@@ -562,6 +694,63 @@ public class M4BApplet extends Applet implements ActionListener{
         //System.out.println(pathway);
     }
 	
+	private void txtInputSearch_actionPerformed(KeyEvent e){
+		System.out.println(txtInputSearch.getText());
+	}
+	
+	@Override
+    public void keyPressed(KeyEvent ev) {
+		//System.out.println("Pressed: "+ev.getKeyCode());
+    }
+    
+    @Override
+    public void keyTyped(KeyEvent ev) {
+		//System.out.println("Typed: "+ev.getKeyCode());
+    }
+	
+    @Override
+    public void keyReleased(KeyEvent ev) {
+		//System.out.println("Released: "+ev.getKeyCode());
+		//System.out.println(txtInputSearch.getText());
+		Object[] inputList = getInputList(txtInputSearch.getText());
+		
+		if(inputList != null){
+			listInput.setListData(inputList);
+			listInput.setSelectedIndex(0);
+		}else{
+			/*listInput.setListData(new Object[0]);
+			listOutput.setListData(new Object[0]);
+			listPathways.setListData(new Object[0]);*/
+			listInput.setModel(new DefaultListModel());
+			listOutput.setModel(new DefaultListModel());
+			listPathways.setModel(new DefaultListModel());
+		}
+    }
+	
+	private void listInput_actionPerformed(ListSelectionEvent e){
+		if (e.getValueIsAdjusting()) {//eger liste uzerinde geziniyorsa ve henuz secim yapmadiysa. bu sayede iki kez secilme engellenmis oluyor. NE GUZEL NE GUZEL.
+			return;
+		}
+		
+		//System.out.println((String) listInput.getSelectedValue());
+		Object[] outputList = getOutputList((String) listInput.getSelectedValue());
+		if(outputList != null){
+			listOutput.setListData(outputList);
+			listOutput.setSelectedIndex(0);
+		}else{
+			listOutput.setModel(new DefaultListModel());
+			listPathways.setModel(new DefaultListModel());
+		}
+	}
+	
+	private void listOutput_actionPerformed(ListSelectionEvent e){
+		if (e.getValueIsAdjusting()) {//eger liste uzerinde geziniyorsa ve henuz secim yapmadiysa. bu sayede iki kez secilme engellenmis oluyor. NE GUZEL NE GUZEL.
+			return;
+		}
+		//btnFind_actionPerformed();
+		//listPathways.setSelectedIndex(0);
+	}
+	
 	private void graphSelection_actionPerformed(Graph2DSelectionEvent e){
 		//printPartInfo("B0015");
 		if(e.isNodeSelection()){//
@@ -581,7 +770,60 @@ public class M4BApplet extends Applet implements ActionListener{
 		}
 	}
     
-    private String[] getPathList(ArrayList<ArrayList<Part>> pathways){
+    private Object[] getInputList(String pattern){
+		String query = "SELECT DISTINCT(part1) AS part1 FROM interactions_wide WHERE type1 = 'I'";		
+		if(pattern != ""){
+			query += " AND part1 LIKE '%"+pattern+"%'";
+		}
+		query += " ORDER BY part1";
+		
+		System.out.println(query);
+		
+		ArrayList<String> allInputs = new ArrayList<String>();
+		try{
+			Statement stmt = con.createStatement();
+			ResultSet set = stmt.executeQuery(query);
+			
+			//allInputs.add("");
+			while(set.next()){
+				allInputs.add(set.getString("part1"));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		Object[] inputList = null;
+		if(allInputs.size() > 0){
+			inputList = allInputs.toArray();
+		}
+		
+		return inputList;
+	}
+	
+	private Object[] getOutputList(String part_id){
+		String query = "SELECT output FROM input_output where input = '"+part_id+"' order by output";
+		ArrayList<String> allOutputs = new ArrayList<String>();
+		try{
+			Statement stmt = con.createStatement();
+			ResultSet set = stmt.executeQuery(query);
+			
+			//allOutputs.add("");
+			while(set.next()){
+				allOutputs.add(set.getString("output"));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		Object[] outputList = null;
+		if(allOutputs.size() > 0){
+			outputList = allOutputs.toArray();
+		}
+		
+		return outputList;
+	}
+	
+	private String[] getPathList(ArrayList<ArrayList<Part>> pathways){
         int size = pathways.size();
         String[] pathList = new String[size];
         
@@ -655,18 +897,6 @@ public class M4BApplet extends Applet implements ActionListener{
 	
     private final void addContentTo(final JRootPane rootPane, Container container) {
         rootPane.setContentPane(container);
-    }
-    
-    private void printList(ArrayList<String> pathways){
-        txtareaPathways.setText("");//ekranï¿½ temizle
-        int size = pathways.size();
-        for (int i = 0; i < size; i++)  {
-            printLine(pathways.get(i));
-        }
-    }
-    
-    private void printLine(String line){
-        txtareaPathways.append(line+"\n");
     }
 	
 	private void printPartInfo(String partID){
