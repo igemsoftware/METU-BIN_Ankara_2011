@@ -1,10 +1,30 @@
-METU-BIN_Ankara
+
+README file for the team METU-BIN_Ankara iGEM 2011
+
+Developed Software:
 M4B: Mining for BioBricks
 
-The source code is composed of 7 .java files. 
-In order to compile the source files, yFiles Graph Visualization library (for which we have a single developer license for dayhoff.ii.metu.edu.tr) is required.
+M4B is a java applet that can find novel composite devices for a user specified input and output based on the parts connection graph that we constructed using the information in Parts Registry.
 
-A compiled and running version of M4B can be reached at: http://dayhoff.ii.metu.edu.tr:8080/m4b/
+The applet is available  at http://dayhoff.ii.metu.edu.tr:8080/m4b/
+
+The applet contains code that remotely access a MySQL database; therefore, it had to be signed with a security certificate. The users should accept the certificate when prompted with "The application's digital signature cannot be verified. Do you want to run the application?" by choosing the "Run" option at the bottom of the notification window.
+
+In order to compile the source code provided at GitHub:
+
+1) The developer should install and create a MySQL database. The "database" directory contains a dump of the current database tables used by M4B. These dump files contain SQL statements that can be executed under MySQL to create the corresponding database locally.
+
+2) The developer should download the Connector/J library which is a java library for connection to MySQL databases. Documentation and download links can be found at: http://dev.mysql.com/usingmysql/java/ and http://dev.mysql.com/downloads/connector/j/
+
+3) The developer should get the yFiles, graph visualization library. METU-BIN_Ankara purchased a single developer license. Hence, we cannot make the licensed library available at GitHub. An evaluation copy of "yFiles for Java" can be obtained from: http://www.yworks.com/en/downloads.html . The current version of yFiles for Java is 2.8.0.3 as of September 18, 2011.
+
+4) The developer should get the JSch - Java Secure Channel library. The library is an implementation of SSH2 for java and allows our applet to connect to sshd servers. The library can be downloaded from: http://www.jcraft.com/jsch/
+
+5) The developer should modify the MySQL database user information hardcoded inside the java source file: IIConnection.java before compilation.
+
+6) The java source files are defined under the package igem_applet and can be compiled using "javac igem_applet/<file name>" in the src directory.
+
+The source code under the directory "src/igem_applet" is composed of 7 .java files. 
 
 M4BApplet.java is the main applet and GUI code.
 
@@ -18,6 +38,5 @@ GraphConstructor.java contains code for generating a visual description of the c
 
 MysqlTunnelSession.java contains code for database access via JDBC.
 
-IIConnection.java contains code to establish database connection to our Part Connections database at the Informatics Institute.
-
+IIConnection.java contains code to establish database connection to our Part Connections database at the Informatics Institute. The original passwords are replaced with "*****". The developer should replace them with their own user/passwords before compilation.
 
