@@ -1,7 +1,7 @@
 METU-BIN_Ankara
 M4B: Mining for BioBricks
 
-The source code is composed of 6 .java files. 
+The source code is composed of 7 .java files. 
 In order to compile the source files, yFiles Graph Visualization library (for which we have a single developer license for dayhoff.ii.metu.edu.tr) is required.
 
 A compiled and running version of M4B can be reached at: http://dayhoff.ii.metu.edu.tr:8080/m4b/
@@ -17,5 +17,7 @@ Part.java contains the class description for a Part object.
 GraphConstructor.java contains code for generating a visual description of the composite device found.
 
 MysqlTunnelSession.java contains code for database access via JDBC.
+
+IIConnection.java contains code to establish database connection to our Part Connections database at the Informatics Institute.
 
 
