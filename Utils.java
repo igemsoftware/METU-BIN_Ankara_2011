@@ -1,5 +1,7 @@
 package igem_applet;
 
+import java.sql.Connection;
+
 public class Utils {
     public Utils() {
     }
@@ -32,5 +34,5 @@ public class Utils {
         }
         
         return ret;
-    } 
+    }
 }

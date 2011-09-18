@@ -18,7 +18,11 @@ import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import y.view.ImageNodeRealizer;
+import y.view.NodeLabel;
 
+import y.view.Graph2DSelectionListener;
+import y.view.Graph2DSelectionEvent;
 
 public class GraphConstructor extends JPanel {
     Graph2DView view;
@@ -31,16 +35,31 @@ public class GraphConstructor extends JPanel {
         mode.allowNodeCreation(false);
         mode.allowBendCreation(false);
         view.addViewMode(mode);
+		
+		/*Graph2DViewActions actions = new Graph2DViewActions(view);  
+		// Create the maps to hold the actions.   
+		ActionMap aMap = actions.createActionMap();  
+		InputMap iMap = actions.createDefaultInputMap(aMap);  */
+		
+		
         add(view);
         
         configureDefaultRealizers();
     }
+	
+	public Graph2D getGraphObject(){
+		return view.getGraph2D();
+	}
+	
+	public Graph2DView getGraphViewObject(){
+		return view;
+	}
     
     protected void configureDefaultRealizers() {
         Graph2D graph = view.getGraph2D();
-        
+		
         EdgeRealizer er = graph.getDefaultEdgeRealizer();//change the looks of the default edge
-        er.setArrow(Arrow.STANDARD);//a standard (target) arrow
+        //er.setArrow(Arrow.STANDARD);//a standard (target) arrow
         
         ShapeNodeRealizer snr = new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT);//change the looks (and type) of the default node
         snr.setSize(80, 30);
@@ -81,19 +100,87 @@ public class GraphConstructor extends JPanel {
             Color nodeColor = getNodeColor(partType);
             
             ShapeNodeRealizer nodeShape = getNodeShape(partType);
-            graph.setDefaultNodeRealizer(nodeShape);
+			ImageNodeRealizer nodeImage = getImageNodeRealizer(partType);
+            //graph.setDefaultNodeRealizer(nodeShape);
+			graph.setDefaultNodeRealizer(nodeImage);
             
-            posX = posX + 110;
+            //posX = posX + 110;
+			posX = posX + 60;
             
             Node stateNode = graph.createNode();
             NodeRealizer nr = graph.getRealizer(stateNode);
             nr.setLocation(posX, posY);
             nr.setLabelText(partID);
-            nr.setFillColor2(nodeColor);
+            //nr.setFillColor2(nodeColor);
         }
         
         
     }
+	
+	private ImageNodeRealizer getImageNodeRealizer(char partType){
+		String imagePath = "resource/questionmark32x32.png";//DEFAULT IMAGE
+        switch(partType){
+            case 'I':
+                imagePath = "resource/metu-bin_icon.PNG";
+                break;
+            case 'P':
+                imagePath = "resource/promoter.png";
+                break;
+            case 'R':
+                imagePath = "resource/rbs.png";
+                break;
+            case 'G':
+                imagePath = "resource/gene.png";
+                break;
+            case 'T':
+                imagePath = "resource/terminator.png";
+                break;
+            case 'O':
+                imagePath = "resource/metu-bin_icon.PNG";
+                break;
+			case 'X':
+				imagePath = "resource/Letter-C.jpg";
+				break;
+			case 'Y':
+				imagePath = "resource/Letter-C.jpg";
+				break;
+			case 'Z':
+				imagePath = "resource/Letter-C.jpg";
+				break;
+			case 'W':
+				imagePath = "resource/Letter-C.jpg";
+				break;
+			case 'Q':
+				imagePath = "resource/Letter-C.jpg";
+				break;
+			case 'U':
+				imagePath = "resource/Letter-C.jpg";
+				break;
+        }
+	
+	
+		//register an image with ImageNodeRealizer.
+		//must be a path name relative to your java CLASSPATH.
+		ImageNodeRealizer inr = new ImageNodeRealizer();
+		//set the image
+		inr.setImageURL(getClass().getResource(imagePath));
+		//set node size equals to half of original image size
+		inr.setToImageSize();
+		//inr.setSize(inr.getWidth()/2, inr.getHeight()/2);
+		inr.setSize(inr.getWidth(), inr.getHeight());
+		
+		//inr.setLocation(60, 200);
+		//set a label text
+		//inr.setLabelText("yFiles");
+
+		//set the label model to be 8-pos (eight available positions around node)
+		inr.getLabel().setModel(NodeLabel.EIGHT_POS);
+
+		//set the label position (S == South of Node)
+		inr.getLabel().setPosition(NodeLabel.S);
+		
+		return inr;
+	}
     
     private Color getNodeColor(char partType){
         Color nodeColor = new Color(100, 100, 100);//DEFAULT COLOR

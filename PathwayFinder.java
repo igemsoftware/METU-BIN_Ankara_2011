@@ -144,11 +144,13 @@ public class PathwayFinder {
 
 	public Hashtable getNetwork3() {
         Hashtable network = new Hashtable();
-
+		System.out.println("EHU EHU");
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-            MysqlTunnelSession session = new MysqlTunnelSession("dayhoff.ii.metu.edu.tr", 22, "****", "******" ,"127.0.0.1", 3306,"root", "********"); /// password removed from source code for security reasons
-			Connection con = session.getConnection("sasandb");
+			/*Class.forName("com.mysql.jdbc.Driver");
+            MysqlTunnelSession session = new MysqlTunnelSession("dayhoff.ii.metu.edu.tr", 22, "****", "********" ,"127.0.0.1", 3306,"root", "*********"); // removed password information
+			Connection con = session.getConnection("sasandb");*/
+			Connection con = IIConnection.getIIConnection();
+
             //String url = "jdbc:mysql://dayhoff.ii.metu.edu.tr:22/sasandb";
             Statement stmt = con.createStatement();
 			ResultSet set = stmt.executeQuery("SELECT * FROM interactions_wide");
@@ -264,29 +266,29 @@ public class PathwayFinder {
             Part part = null;
             if (isPartInNetwork) {
                 part = (Part) network.get(parent);
-                //part.nextParts = null; //TODO lüzumu halinde açýlacak. sebebi aþaðýda yazýyor.
-                                        //nextParts deðiþkeni þimdilik silinmedi.
-                                       //eðer ilerde kullanýlmazsa Part class'ý gibi ayrý bi class tanýmlanýp kullanýlmasý iyi olur.
-                                       //Bu class'ýn içinde nextParts deðiþkeni olmayacak.
-                                       //Ya da burda path'e eklenmeden önce nextParts deðeri null'a eþitlenir. bu daha iyi bence.
+                //part.nextParts = null; //TODO luzumu halinde acilacak. sebebi asagida yaziyor.
+                                        //nextParts degiskeni þimdilik silinmedi.
+                                       //eger ilerde kullanilmazsa Part class'i gibi ayri bi class tanimlanip kullanilmasi iyi olur.
+                                       //Bu class'in içinde nextParts degiskeni olmayacak.
+                                       //Ya da burda path'e eklenmeden once nextParts degeri null'a esitlenir. bu daha iyi bence.
             }else{
-                part = new Part(parent, "", "", "", "", null);//bunun çocuklarý olmadýðý için zaten aþaðýda path'ten çýkarýlacak. bu yüzden tipini yazmaya gerek yok.
+                part = new Part(parent, "", "", "", "", null);//bunun cocuklari olmadigi icin zaten asagida path'ten cikarilacak. bu yüzden tipini yazmaya gerek yok.
             }
 
 
-            if(part.partType.equals("X") ||
+            /*if(part.partType.equals("X") ||
                part.partType.equals("Y") ||
                part.partType.equals("Z") ||
                part.partType.equals("W") ||
                part.partType.equals("Q")){
                 System.out.println(part.partType + "\t" + part.partID);
-            }
+            }*/
 
 
-            if(getIndex(parent, path) < 0){//aynisindan daha once eklemediysek. bu, LOOP'u engellemek için yapýlan bir kontroldür.
+            if(getIndex(parent, path) < 0){//aynisindan daha once eklemediysek. bu, LOOP'u engellemek icin yapýlan bir kontroldür.
                 if (parent.equals(output)) {
-                    //TODO BURAYA DÝKKAT
-                    //TODO burda önce genin terminator'ý ekleniyor.??????
+                    //TODO BURAYA DIKKAT
+                    //TODO burda once genin terminator'i ekleniyor.??????
                     Part gene = path.get(path.size()-1);
                     Part terminator = new Part("", "T", "", "", "", null);
                     if(gene.terminator.equals("")){
@@ -300,7 +302,9 @@ public class PathwayFinder {
                                          //Ancak, RBS+Gene ve Promoter+RBS+Gene de olabilir. bunlar icin ozel sart koyulacak.
                     path.add(outputPart);//TODO bu doðru bir uygulama gibi görünüyor. ama daha sonra kontrol edilmesinde fayda var.
 
-                    String parts = "";
+                    /* TODO Burdaki islemler program gelistiricisi icin
+
+					String parts = "";
                     String partTypes = "";
                     for (int k = 0; k < path.size(); k++)  {
                         parts += path.get(k).partID + ">";
@@ -308,7 +312,7 @@ public class PathwayFinder {
                     }
                     System.out.println(parts);
                     writeFile(parts, 1);
-                    writeFile(partTypes, 1);
+                    writeFile(partTypes, 1);*/
 
                     ArrayList<Part> path1 = new ArrayList<Part>();
                     for (int ik = 0; ik < path.size(); ik++){//The reason is Java and C# uses reference based assignments so they just pass reference, for solving this problem, a copy of the object is taken and then it is destroyed.
@@ -321,7 +325,7 @@ public class PathwayFinder {
 
                     //path1 = new ArrayList<Part>();
                 }else{
-                    /*if(!part.partID.equals("$")){//TODO constitutive'ler için yapýlan bi deneme
+                    /*if(!part.partID.equals("$")){//TODO constitutive'ler için yapilan bi deneme
                         path.add(part);
                     }*/
                     path.add(part);
@@ -338,8 +342,8 @@ public class PathwayFinder {
                             //EGER BU OUTPUT BU PROMOTER'A INPUT OLARAK GIRIYORSA PATH DOGRUDUR.
                             //GIRMIYORSA BASKA YOLDAN DEVAM EDECEK.lastNode
 
-                            Part lastNode = path.get(path.size()-2);
-                            if(lastNode.partType.equals("T")){//partType Promoter ise lastNode'un partType'i ya T ya da I olmalýdýr, diye düþünüyorum, ben, yaaanii.
+                            Part lastNode = path.get(path.size()-2);//BIR ONCESI
+                            if(lastNode.partType.equals("T")){//partType Promoter ise lastNode'un partType'i ya T ya da I olmalidir, diye düþünüyorum, ben, yaaanii.
                                 lastNode = path.get(path.size()-3);//MUST BE IN G,Y,Z,Q
 
                                 Part outputNode = (Part) network.get(lastNode.output);
@@ -361,10 +365,10 @@ public class PathwayFinder {
                                 if(lastNode.partType.equals("I")){//path size'ýn 2'den büyük olmasý demek, lastNode'un ilk node olmamasý demek.
                                     if(path.size() > 2){
                                         lastNode = path.get(path.size()-3);//MUST BE IN G,Y,Z,Q,W
-                                        if(lastNode.partType.equals("G")
+                                        /*if(lastNode.partType.equals("G")
                                            || lastNode.partType.equals("Y")
                                            || lastNode.partType.equals("Z")
-                                           || lastNode.partType.equals("Q")){
+                                           || lastNode.partType.equals("Q")){*/
                                             Part terminator = new Part("", "T", "", "", "", null);
                                             if(lastNode.terminator.equals("")){
                                                 System.out.println("[2] TERMINATOR'SIZ GEN: " + lastNode.partID);//TODO Silinecek
@@ -375,9 +379,9 @@ public class PathwayFinder {
 
                                             path.add(path.size()-2, terminator);//ARAYA TERMINATOR SOKUYORUZ
                                             path.remove(path.size()-2);//TERMINATOR'DAN BÝR SONRA GELEN INPUT TIPINDEKI NODE'U SÝLÝYORUZ.
-                                        }else{
+                                        /*}else{
                                             //TODO
-                                        }
+                                        }*/
                                     }
                                 }else{
                                     //TODO buraya bi þey yazmaya gerek yok bence.
@@ -408,7 +412,7 @@ public class PathwayFinder {
                         }
                     }else{
                         path.remove(path.size()-1);
-                        path = cropPath(path, childCountStack);//DOÐRU
+                        path = cropPath(path, childCountStack);//DOGRU. BI DAHA BI DAHA KONTROL ETME.
                     }
                 } else {//node doesn't have any children (leaf node)
                     //son ekledigimizi cikariyoruz.
@@ -417,11 +421,11 @@ public class PathwayFinder {
                     if(lastNode.partID.equals(output)){
                         path.remove(path.size()-1);//REMOVE LAST NODE AGAIN, BECAUSE OF TERMINATOR
                     }
-                    path = cropPath(path, childCountStack);//DOÐRU
+                    path = cropPath(path, childCountStack);//DOGRU. BI DAHA BI DAHA KONTROL ETME.
                 }
             } else {//AYNISI VAR
                 //System.out.println("AYNISI VAR: " + parent);
-                path = cropPath(path, childCountStack);//DOÐRU
+                path = cropPath(path, childCountStack);//DOGRU. BI DAHA BI DAHA KONTROL ETME.
             }
         }
 
@@ -430,21 +434,25 @@ public class PathwayFinder {
         return pathList;
     }
 
-     private boolean checkDeviceCount(ArrayList<Part> path, Integer deviceCount){
-         int size = path.size();
-         int count = 0;
-         for (int i = 0; i < size; i++)  {
-             if(path.get(i).partType.equals("T")){
-                 count++;
-             }
+	private boolean checkDeviceCount(ArrayList<Part> path, Integer deviceCount) {
+        if(deviceCount < 1){
+            return true;
+        }
 
-             if(count > deviceCount){
-                 return false;
-             }
-         }
+        int size = path.size();
+        int count = 0;
+        for (int i = 0; i < size; i++) {
+            if (path.get(i).partType.equals("T")) {
+                count++;
+            }
 
-         return true;
-     }
+            if (count > deviceCount) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private int getIndex(String part, ArrayList<Part> path){
         int index = -1;
