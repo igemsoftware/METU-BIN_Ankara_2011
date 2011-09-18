@@ -1,3 +1,5 @@
+This file contains a set of instructions for those who are new to GitHub and want to quickly upload/modify their repositories.
+
 GitHub Howto update an existing repository:
 
 1. Run GitHub Bash shell using the shortcut (Git Bash) on the desktop
@@ -23,9 +25,17 @@ $ git add M4BApplet.java
 $ git add README
 etc.
 
+If you want to move files to another directory use:
+
+git mv <file> <new destination>
+
+If you want to add a complete directory use:
+
+git add <directory name>
+
 6. Commit your changes
 
-$ git commit 'M4B source"
+$ git commit -m 'M4B source"
 
 7. Submit your changes
 
