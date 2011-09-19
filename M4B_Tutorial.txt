@@ -1,0 +1,9 @@
+Instructions: How to use M4B?
+
+M4B: Mining for BioBricks is a software that scans the parts on the database we created by the relational data of 2011 distribution and shows the combination of parts which starts with a specific promoter and a specific gene, of course after gene there is always terminator.
+
+The specifity is determined by users. Our software provides two textfields for input of the desired device and output of it. By these parameters, users select those and with the other options, hit the search button and take results of possible desired devices.
+
+In the results area, possible devices are shown by the specific order of parts' ID's given by PartsRegistry. So you can know which parts a resulted device is composed of. When a result is clicked, it's composition is shown graphically with exact PartsRegistry images just above the results field.
+
+At the left of the software, you'll see the information field for the parts. When you click on a part in the field of graphical results, its all the information available in XML database of PartsRegistry will appear.
