@@ -981,14 +981,13 @@ public class M4BApplet extends Applet implements ActionListener{
 		return outputList;
 	}
 	
-	private String[] getPathList(ArrayList<ArrayList<Part>> pathways) {
-        progressBar.setVisible(true);
+	    private String[] getPathList(ArrayList<ArrayList<Part>> pathways) {
+        //progressBar.setVisible(true);
         int size = pathways.size();
         String[] pathList = new String[size];
         double[] pathScores = new double[size];
-        double maxScore = 0.0;
         
-        String loading = "Loading: ";
+        //String loading = "Loading: ";
         for (int i = 0; i < size; i++) {
             double score = 1;
             ArrayList<Part> path = pathways.get(i);
@@ -1009,47 +1008,27 @@ public class M4BApplet extends Applet implements ActionListener{
             lblLoading.repaint();
             validate();*/
             
-            int value = progressBar.getValue() + 7;
+            /*int value = progressBar.getValue() + 7;
             if (value > progressBar.getMaximum()) {
               value = progressBar.getMaximum();
             }
             progressBar.setValue(value);
             validate();
             progressBar.repaint();
-            validate();
-            
-            
-            if(i == 0){
-                maxScore = score;
-            }else if(score > maxScore){
-                maxScore = score;
-                
-            }
-            
-            /*pathScores[i] = score;
-            //pathList[i] = "["+score+"]>"+strPath;
-            pathList[i] = strPath;*/
+            validate();*/
             
             pathScores[i] = Math.exp(score);
-            pathList[i] = "["+pathScores[i]+"]>"+strPath;
+            //pathList[i] = "["+pathScores[i]+"]>"+strPath;
+            pathList[i] = "["+String.format("%.5g%n", pathScores[i])+"]>"+strPath;
         }
-        
-        /*for (int i = 0; i < size; i++) {
-            //pathScores[i] = round((pathScores[i] / maxScore * -100 + 10000) / 99, 2);
-            //pathScores[i] = Utils.round((pathScores[i] / maxScore), 2);
-            pathScores[i] = Math.exp(pathScores[i]);
-            pathList[i] = "["+pathScores[i]+"]>"+pathList[i];
-        }*/
         
         Utils.bubbleSort1(pathScores, pathList);
         
         //lblLoading.setText("");
-        progressBar.setVisible(false);
+        //progressBar.setVisible(false);
         
         return pathList;
     }
-    
-
     
     private double getEdgeScore(String part1, String part2){
         double edgeScore = 0.0;
