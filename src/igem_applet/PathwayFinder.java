@@ -9,6 +9,10 @@ package igem_applet;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -16,13 +20,6 @@ import java.util.Hashtable;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-
-
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
 public class PathwayFinder {
     private static String USAGE = "java PathwayFinder [Interactions File] [Input Part] [Output Part]";
@@ -212,7 +209,7 @@ public class PathwayFinder {
     public ArrayList<ArrayList<Part>> findAllPathways(Hashtable network, String inputPart, String outputPart, Integer deviceCount) {
         ArrayList<ArrayList<Part>> pathways = null;
         
-		System.out.println(inputPart +"\t>\t"+ outputPart);
+		//System.out.println(inputPart +"\t>\t"+ outputPart);
 		
         if (network.containsKey(inputPart)) { //TODO bunun gercekten input olup olmadigi kontrol edilebilir.
             firstCall = true;
@@ -290,7 +287,7 @@ public class PathwayFinder {
                     Part terminator = new Part("", "T", "", "", "", null);
                     if(gene.terminator.equals("")){
                         System.out.println("[1] TERMINATOR'SIZ GEN: " + gene.partID);//TODO Silinecek
-                        terminator.partID = "UNDEFINED_TERMINATOR";
+                        terminator.partID = "ANY TERMINATOR";
                     }else{
                         terminator.partID = gene.terminator;
                     }
@@ -369,7 +366,7 @@ public class PathwayFinder {
                                             Part terminator = new Part("", "T", "", "", "", null);
                                             if(lastNode.terminator.equals("")){
                                                 System.out.println("[2] TERMINATOR'SIZ GEN: " + lastNode.partID);//TODO Silinecek
-                                                terminator.partID = "UNDEFINED_TERMINATOR";
+                                                terminator.partID = "ANY TERMINATOR";
                                             }else{
                                                 terminator.partID = lastNode.terminator;
                                             }
@@ -506,8 +503,7 @@ public class PathwayFinder {
                 firstCall = false;
             } else {
                 fstream = new FileWriter(outFileName, true); //append mode
-                fstream2 = 
-                        new FileWriter(interactionsFileName, true); //append mode
+                fstream2 = new FileWriter(interactionsFileName, true); //append mode
             }
             BufferedWriter out;
             if (fileNo == 1) {

@@ -35,4 +35,32 @@ public class Utils {
         
         return ret;
     }
+	
+	public static void bubbleSort1(double[] scores, String[] paths) {
+        int n = scores.length;
+        for (int pass = 1; pass < n; pass++) {  // count how many times
+            // This next loop becomes shorter and shorter
+            for (int i = 0; i < n-pass; i++) {
+                if (scores[i] < scores[i+1]) {
+                    // exchange elements
+                    double temp = scores[i];  
+                    scores[i] = scores[i+1];  
+                    scores[i+1] = temp;
+                    
+                    String tempPath = paths[i];  
+                    paths[i] = paths[i+1];  
+                    paths[i+1] = tempPath;
+                }
+            }
+        }
+    }
+    
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
 }
