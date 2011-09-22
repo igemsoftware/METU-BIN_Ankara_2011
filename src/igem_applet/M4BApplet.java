@@ -981,7 +981,7 @@ public class M4BApplet extends Applet implements ActionListener{
 		return outputList;
 	}
 	
-	    private String[] getPathList(ArrayList<ArrayList<Part>> pathways) {
+	private String[] getPathList(ArrayList<ArrayList<Part>> pathways) {
         //progressBar.setVisible(true);
         int size = pathways.size();
         String[] pathList = new String[size];
@@ -1019,7 +1019,7 @@ public class M4BApplet extends Applet implements ActionListener{
             
             pathScores[i] = Math.exp(score);
             //pathList[i] = "["+pathScores[i]+"]>"+strPath;
-            pathList[i] = "["+String.format("%.5g%n", pathScores[i])+"]>"+strPath;
+            pathList[i] = "["+String.format("%.5g", pathScores[i])+"]>"+strPath;
         }
         
         Utils.bubbleSort1(pathScores, pathList);
@@ -1040,17 +1040,18 @@ public class M4BApplet extends Applet implements ActionListener{
             if(set.next()) {
                 edgeScore = set.getDouble("score");
                 if(edgeScore <= 0.0){
-                    edgeScore = 0.01;
+                    edgeScore = 0.1;//0.01
                 }
             }else{
-                edgeScore = 0.01;
+                edgeScore = 0.1;//0.01
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
         }
         
-        edgeScore = 1/(1+(Math.exp(-0.1*(edgeScore-100))/Math.pow(1.8,-0.1*(edgeScore-100))));
+        //edgeScore = 1/(1+(Math.exp(-0.1*(edgeScore-100))/Math.pow(1.8,-0.1*(edgeScore-100))));
+		edgeScore = 1/(1+(Math.exp(-0.3*(edgeScore-5))/Math.pow(1.1,-0.3*(edgeScore-5))));
         
         edgeScore = Math.log(edgeScore);
 
